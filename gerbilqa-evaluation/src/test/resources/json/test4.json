@@ -1,0 +1,42 @@
+{
+  "questions": [
+    {
+      "id": "19",
+      "answertype": "string",
+      "aggregation": "false",
+      "onlydbo": "true",
+      "hybrid": "false",
+      "question": [
+        {
+          "language": "en",
+          "string": "What is the name of the Viennese newspaper founded by the creator of the croissant?"
+        }
+      ],
+      "query": {
+        "pseudo": "PREFIX dbo: <http://dbpedia.org/ontology/> PREFIX res: <http://dbpedia.org/resource/> SELECT DISTINCT ?name WHERE {        res:Croissant dbo:creator ?x .        ?x text:\"founder of\" ?name . }"
+      },
+      "answers": [
+        {
+          "head": {
+            "vars": [
+              "proj"
+            ]
+          },
+          "results": { "bindings": [
+            {
+              "proj": {
+                "type": "text",
+                "value": "Bla"
+              }
+            },{
+              "proj": {
+                "type": "text",
+                "value": "Milch"
+              }
+            }
+            ] }
+        }
+      ]
+    }
+]
+}
