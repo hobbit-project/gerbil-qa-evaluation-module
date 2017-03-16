@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.aksw.gerbil.config.GerbilConfiguration;
 import org.aksw.gerbil.dataset.converter.Literal2ResourceManager;
 import org.aksw.gerbil.dataset.converter.impl.SPARQLBasedLiteral2Resource;
 import org.aksw.gerbil.matching.EvaluationCounts;
@@ -27,32 +28,37 @@ import org.hobbit.vocab.HOBBIT;
 
 public class GerbilEvaluationModule extends AbstractEvaluationModule {
 
+	private static final String ENDPOINT_KEY = "org.aksw.gerbil.dataset.converter.domain";
+
+	private static final String WELL_KNOWN_KBS = "org.aksw.gerbil.evaluate.DefaultWellKnownKB";
+
 	private String qLang = "en";
 
 	private Literal2ResourceManager converterManager = new Literal2ResourceManager();
 	private QAMatchingsCounter counter;
-	private String endpoint = "http://dbpedia.org/sparql?default-graph-uri=http%3A%2F%2Fdbpedia.org";
-
+	private String endpoint;
 	private EvaluationCounts globalCounts = new EvaluationCounts();
 	private double[] macro = new double[] { 0, 0, 0 };
 	private int size = 0;
 	private int errorCount = 0;
 
+	private String[] kbs;
+
 	public GerbilEvaluationModule() {
 		super();
+		this.kbs = GerbilConfiguration.getInstance().getStringArray(WELL_KNOWN_KBS);
+		this.endpoint = GerbilConfiguration.getInstance().getString(ENDPOINT_KEY);
+		
 		converterManager
 				.registerLiteral2Resource(new SPARQLBasedLiteral2Resource(
 						endpoint));
-		// TODO instead of hard coding the KNOWN KBS use a properties file!
+
 		counter = new QAMatchingsCounter(null, new UrlValidator(),
-				new SimpleWhiteListBasedUriKBClassifier(
-						"http://dbpedia.org/resource/",
-						"http://dbpedia.org/ontology/",
-						"http://ontologydesignpatterns.org/ont/dul/",
-						"http://www.ontologydesignpatterns.org/ont/d0.owl"),
+				new SimpleWhiteListBasedUriKBClassifier(this.kbs),
 				converterManager);
 	}
 
+	
 	@SuppressWarnings("rawtypes")
 	@Override
 	protected void evaluateResponse(byte[] expectedData, byte[] receivedData,
