@@ -157,9 +157,9 @@ public class GerbilEvaluationModuleTest extends GerbilEvaluationModule {
 
 	@Test
 	public void checkErrorEvaluation() throws Exception {
-		GerbilEvaluationModule eval = new GerbilEvaluationModule();
-		String test = "this message should be irrelevant";
-		eval.evaluateResponse(test.getBytes(), new byte[0], 0L, 0L);
+		GerbilEvaluationModuleTest eval = new GerbilEvaluationModuleTest();
+		eval.experimentUri="http://test.com";
+		eval.evaluateResponse(load("src/test/resources/json/test1.json"), new byte[0], 0L, 0L);
 		Model m = eval.summarizeEvaluation();
 		QueryExecution exec = QueryExecutionFactory.create(ASK_ERROR_QUERY, m);
 		assertTrue(exec.execAsk());

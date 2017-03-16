@@ -2,6 +2,9 @@ package org.aksw.hobbit.gerbil.qa.evaluation;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.aksw.gerbil.dataset.converter.Literal2ResourceManager;
 import org.aksw.gerbil.dataset.converter.impl.SPARQLBasedLiteral2Resource;
 import org.aksw.gerbil.matching.EvaluationCounts;
@@ -40,7 +43,7 @@ public class GerbilEvaluationModule extends AbstractEvaluationModule {
 		converterManager
 				.registerLiteral2Resource(new SPARQLBasedLiteral2Resource(
 						endpoint));
-		//TODO instead of hard coding the KNOWN KBS use a properties file!
+		// TODO instead of hard coding the KNOWN KBS use a properties file!
 		counter = new QAMatchingsCounter(null, new UrlValidator(),
 				new SimpleWhiteListBasedUriKBClassifier(
 						"http://dbpedia.org/resource/",
@@ -50,40 +53,38 @@ public class GerbilEvaluationModule extends AbstractEvaluationModule {
 				converterManager);
 	}
 
+	@SuppressWarnings("rawtypes")
 	@Override
 	protected void evaluateResponse(byte[] expectedData, byte[] receivedData,
 			long taskSentTimestamp, long responseReceivedTimestamp)
 			throws Exception {
-		if (receivedData.length == 0) {
-			// Error occured
-			errorCount++;
-			return;
-		}
+		
+		List<AnswerSet> recvAnswers = getMarkings(receivedData, false);
+		List<AnswerSet> goldenStandard = getMarkings(expectedData, true);
 
-		QaldJson expectedQald = (QaldJson) ExtendedQALDJSONLoader.readJson(
-				new ByteArrayInputStream(expectedData), QaldJson.class);
-		QaldJson receivedQald = (QaldJson) ExtendedQALDJSONLoader.readJson(
-				new ByteArrayInputStream(receivedData), QaldJson.class);
-		IQuestion expectedQuestion = EJQuestionFactory
-				.getQuestionsFromQaldJson(expectedQald).get(0);
-		IQuestion receivedQuestion = EJQuestionFactory
-				.getQuestionsFromQaldJson(receivedQald).get(0);
-		// TODO is this always responding the right Language? Should be
-		qLang = expectedQuestion.getLanguageToQuestion().keySet().iterator()
-				.next();
-		converterManager.setQuestionLanguage(qLang);
-
-		Document expDoc = QAUtils.translateQuestion(expectedQuestion, null,
-				qLang);
-		Document recvDoc = QAUtils.translateQuestion(receivedQuestion, null,
-				qLang);
-
-		EvaluationCounts counts = counter.countMatchings(
-				recvDoc.getMarkings(AnswerSet.class),
-				expDoc.getMarkings(AnswerSet.class));
+		EvaluationCounts counts = counter.countMatchings(recvAnswers,
+				goldenStandard);
 		globalCounts.add(counts);
 		addMacro(macro, calculateMeasures(counts));
 		size++;
+	}
+
+	@SuppressWarnings("rawtypes")
+	private List<AnswerSet> getMarkings(byte[] content, boolean setLang) {
+		if (content.length == 0) {
+			errorCount++;
+			return new ArrayList<AnswerSet>();
+		}
+		QaldJson qald = (QaldJson) ExtendedQALDJSONLoader.readJson(
+				new ByteArrayInputStream(content), QaldJson.class);
+		IQuestion question = EJQuestionFactory.getQuestionsFromQaldJson(qald)
+				.get(0);
+		if (setLang) {
+			qLang = question.getLanguageToQuestion().keySet().iterator().next();
+			converterManager.setQuestionLanguage(qLang);
+		}
+		Document doc = QAUtils.translateQuestion(question, null, qLang);
+		return doc.getMarkings(AnswerSet.class);
 	}
 
 	private void addMacro(double[] global, double[] add) {
