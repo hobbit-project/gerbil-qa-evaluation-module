@@ -67,12 +67,20 @@ public class GerbilEvaluationModule extends AbstractEvaluationModule {
 		
 		List<AnswerSet> recvAnswers = getMarkings(receivedData, false);
 		List<AnswerSet> goldenStandard = getMarkings(expectedData, true);
+	
 
 		EvaluationCounts counts = counter.countMatchings(recvAnswers,
 				goldenStandard);
 		globalCounts.add(counts);
 		addMacro(macro, calculateMeasures(counts));
 		size++;
+	}
+	
+	private void cleanLiterals(List<AnswerSet> answers){
+	    for(int i=0;i<answers.size();i++){
+		
+		
+	    }
 	}
 
 	@SuppressWarnings("rawtypes")
@@ -85,10 +93,10 @@ public class GerbilEvaluationModule extends AbstractEvaluationModule {
 				new ByteArrayInputStream(content), QaldJson.class);
 		IQuestion question = EJQuestionFactory.getQuestionsFromQaldJson(qald)
 				.get(0);
-		if (setLang) {
-			qLang = question.getLanguageToQuestion().keySet().iterator().next();
-			converterManager.setQuestionLanguage(qLang);
-		}
+//		if (setLang) {
+//			qLang = question.getLanguageToQuestion().keySet().iterator().next();
+//			converterManager.setQuestionLanguage(qLang);
+//		}
 		Document doc = QAUtils.translateQuestion(question, null, qLang);
 		return doc.getMarkings(AnswerSet.class);
 	}
@@ -121,6 +129,7 @@ public class GerbilEvaluationModule extends AbstractEvaluationModule {
 		model.addLiteral(experimentResource, GERBIL.microRecall, micro[1]);
 		model.addLiteral(experimentResource, GERBIL.microF1, micro[2]);
 		model.addLiteral(experimentResource, GERBIL.errorCount, errorCount);
+		
 
 		return model;
 	}
