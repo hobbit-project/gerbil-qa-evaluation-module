@@ -1,0 +1,62 @@
+{
+  "questions": [
+    {
+      "id": "1",
+      "answertype": "boolean",
+      "aggregation": "false",
+      "onlydbo": "false",
+      "hybrid": "false",
+      "question": [
+        {
+          "language": "en",
+          "string": "Are penguins endangered?",
+          "keywords": "penguins2, endangered2"
+        },
+        {
+          "language": "fa",
+          "string": "",
+          "keywords": ""
+        },
+        {
+          "language": "de",
+          "string": "Sind Pinguine vom Aussterben gefärdet?",
+          "keywords": "Pinguine, Aussterben, Gefahr"
+        },
+        {
+          "language": "es",
+          "string": "",
+          "keywords": ""
+        },
+        {
+          "language": "it",
+          "string": "I pinguini sono una specie in pericolo?",
+          "keywords": "pinguini, specie, pericolo"
+        },
+        {
+          "language": "fr",
+          "string": "Est-ce que les pingouins sont une espèce menacée d'extinction?",
+          "keywords": "pingouins, espèce, menacée d'extinction"
+        },
+        {
+          "language": "nl",
+          "string": "",
+          "keywords": ""
+        },
+        {
+          "language": "ro",
+          "string": "",
+          "keywords": ""
+        }
+      ],
+      "query": {
+        "sparql": "PREFIX dbo: <http://dbpedia.org/ontology/> PREFIX dbr: <http://dbpedia.org/resource/> ask where {?uri dbo:family dbr:Penguin2 . ?uri dbo:conservationStatus 'EN' . }"
+      },
+      "answers": [
+        {
+          "head": {},
+          "boolean": false
+        }
+      ]
+    }
+  ]
+}

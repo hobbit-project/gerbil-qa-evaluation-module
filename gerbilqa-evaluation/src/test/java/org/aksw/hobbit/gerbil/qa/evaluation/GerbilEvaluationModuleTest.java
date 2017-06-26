@@ -49,6 +49,12 @@ public class GerbilEvaluationModuleTest extends GerbilEvaluationModule {
         testConfigs.add(new Object[] {ASK_EQUAL_QUERY, 
         		new String[]{"src/test/resources/json/test1.json","src/test/resources/json/test2.json"},
         		new String[]{"src/test/resources/json/test1.json","src/test/resources/json/test2.json"}});
+        testConfigs.add(new Object[] {ASK_EQUAL_QUERY, 
+        		new String[]{"src/test/resources/json/test1.json","src/test/resources/json/test8.json"},
+        		new String[]{"src/test/resources/json/test1.json","src/test/resources/json/test8.json"}});
+        testConfigs.add(new Object[] {ASK_NOT_EQUAL_QUERY, 
+        		new String[]{"src/test/resources/json/test1.json","src/test/resources/json/test8.json"},
+        		new String[]{"src/test/resources/json/test1.json","src/test/resources/json/test9.json"}});
         testConfigs.add(new Object[] {ASK_NOT_EQUAL_QUERY,
         		new String[]{"src/test/resources/json/test1.json","src/test/resources/json/test2.json"},
         		new String[]{"src/test/resources/json/test2.json","src/test/resources/json/test1.json"}});

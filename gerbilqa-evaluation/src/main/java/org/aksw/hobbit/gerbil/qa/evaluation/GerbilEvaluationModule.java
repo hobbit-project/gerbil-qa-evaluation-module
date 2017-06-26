@@ -2,6 +2,7 @@ package org.aksw.hobbit.gerbil.qa.evaluation;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -13,6 +14,8 @@ import org.aksw.gerbil.matching.impl.QAMatchingsCounter;
 import org.aksw.gerbil.qa.QAUtils;
 import org.aksw.gerbil.qa.datatypes.AnswerSet;
 import org.aksw.gerbil.semantic.kb.SimpleWhiteListBasedUriKBClassifier;
+import org.aksw.gerbil.semantic.sameas.SameAsRetriever;
+import org.aksw.gerbil.semantic.sameas.impl.index.IndexBasedSameAsRetriever;
 import org.aksw.gerbil.semantic.vocabs.GERBIL;
 import org.aksw.gerbil.transfer.nif.Document;
 import org.aksw.qa.commons.datastructure.IQuestion;
@@ -24,9 +27,16 @@ import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.vocabulary.RDF;
 import org.hobbit.core.components.AbstractEvaluationModule;
+import org.hobbit.core.rabbit.RabbitMQUtils;
 import org.hobbit.vocab.HOBBIT;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import it.unimi.dsi.fastutil.Arrays;
 
 public class GerbilEvaluationModule extends AbstractEvaluationModule {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(GerbilEvaluationModule.class);
 
 	private static final String ENDPOINT_KEY = "org.aksw.gerbil.dataset.converter.domain";
 
@@ -41,6 +51,8 @@ public class GerbilEvaluationModule extends AbstractEvaluationModule {
 	private double[] macro = new double[] { 0, 0, 0 };
 	private int size = 0;
 	private int errorCount = 0;
+	
+	private int question = 0;
 
 	private String[] kbs;
 
@@ -52,7 +64,7 @@ public class GerbilEvaluationModule extends AbstractEvaluationModule {
 		converterManager
 				.registerLiteral2Resource(new SPARQLBasedLiteral2Resource(
 						endpoint));
-
+//		SameAsRetriever retriever = new IndexBasedSameAsRetriever();
 		counter = new QAMatchingsCounter(null, new UrlValidator(),
 				new SimpleWhiteListBasedUriKBClassifier(this.kbs),
 				converterManager);
@@ -67,21 +79,20 @@ public class GerbilEvaluationModule extends AbstractEvaluationModule {
 		
 		List<AnswerSet> recvAnswers = getMarkings(receivedData, false);
 		List<AnswerSet> goldenStandard = getMarkings(expectedData, true);
-	
+		
+		
+		LOGGER.info(question+" recv: "+recvAnswers+"\n");
+	    LOGGER.info(question+" expc: "+goldenStandard+"\n");
 
 		EvaluationCounts counts = counter.countMatchings(recvAnswers,
 				goldenStandard);
+		LOGGER.info(question+" counts: "+counts);
+		question++;
 		globalCounts.add(counts);
 		addMacro(macro, calculateMeasures(counts));
 		size++;
 	}
 	
-	private void cleanLiterals(List<AnswerSet> answers){
-	    for(int i=0;i<answers.size();i++){
-		
-		
-	    }
-	}
 
 	@SuppressWarnings("rawtypes")
 	private List<AnswerSet> getMarkings(byte[] content, boolean setLang) {
@@ -115,6 +126,8 @@ public class GerbilEvaluationModule extends AbstractEvaluationModule {
 	protected Model summarizeEvaluation() throws Exception {
 		double[] micro = calculateMeasures(globalCounts);
 		double[] macro = getFinalMacro(this.macro, size);
+		LOGGER.info("final micro: prec: "+micro[0]+", recall: "+micro[1]+", f1: "+micro[2]);
+		LOGGER.info("final macro: prec: "+macro[0]+", recall: "+macro[1]+", f1: "+macro[2]);
 
 		// All tasks/responsens have been evaluated. Summarize the results,
 		// write them into a Jena model and send it to the benchmark controller.
@@ -130,7 +143,6 @@ public class GerbilEvaluationModule extends AbstractEvaluationModule {
 		model.addLiteral(experimentResource, GERBIL.microF1, micro[2]);
 		model.addLiteral(experimentResource, GERBIL.errorCount, errorCount);
 		
-
 		return model;
 	}
 
