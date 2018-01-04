@@ -24,7 +24,9 @@ import org.aksw.qa.commons.load.json.ExtendedQALDJSONLoader;
 import org.aksw.qa.commons.load.json.QaldJson;
 import org.apache.commons.validator.routines.UrlValidator;
 import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.Property;
 import org.apache.jena.rdf.model.Resource;
+import org.apache.jena.rdf.model.ResourceFactory;
 import org.apache.jena.vocabulary.RDF;
 import org.hobbit.core.components.AbstractEvaluationModule;
 import org.hobbit.core.rabbit.RabbitMQUtils;
@@ -140,6 +142,7 @@ public class GerbilEvaluationModule extends AbstractEvaluationModule {
 		// write them into a Jena model and send it to the benchmark controller.
 		Model model = createDefaultModel();
 		Resource experimentResource = model.getResource(experimentUri);
+		Property noQuestions = model.createProperty(GERBIL.getURI(), "noOfQuestions");
 		model.add(experimentResource, RDF.type, HOBBIT.Experiment);
 
 		model.addLiteral(experimentResource, GERBIL.macroPrecision, macro[0]);
@@ -149,6 +152,7 @@ public class GerbilEvaluationModule extends AbstractEvaluationModule {
 		model.addLiteral(experimentResource, GERBIL.microRecall, micro[1]);
 		model.addLiteral(experimentResource, GERBIL.microF1, micro[2]);
 		model.addLiteral(experimentResource, GERBIL.errorCount, errorCount);
+		model.addLiteral(experimentResource, noQuestions, size);
 		
 		return model;
 	}
