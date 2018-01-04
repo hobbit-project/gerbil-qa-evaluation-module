@@ -100,8 +100,15 @@ public class GerbilEvaluationModule extends AbstractEvaluationModule {
 			errorCount++;
 			return new ArrayList<AnswerSet>();
 		}
-		QaldJson qald = (QaldJson) ExtendedQALDJSONLoader.readJson(
+		QaldJson qald =null;
+		try{
+		qald = (QaldJson) ExtendedQALDJSONLoader.readJson(
 				new ByteArrayInputStream(content), QaldJson.class);
+		}catch(Exception e){
+			LOGGER.error("could not load returned qald json", e);
+			errorCount++;
+			return new ArrayList<AnswerSet>();
+		}
 		IQuestion question = EJQuestionFactory.getQuestionsFromQaldJson(qald)
 				.get(0);
 //		if (setLang) {
