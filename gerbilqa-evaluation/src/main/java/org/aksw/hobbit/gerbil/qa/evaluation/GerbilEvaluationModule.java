@@ -135,6 +135,7 @@ public class GerbilEvaluationModule extends AbstractEvaluationModule {
 	protected Model summarizeEvaluation() throws Exception {
 		double[] micro = calculateMeasures(globalCounts);
 		double[] macro = getFinalMacro(this.macro, size);
+		double responsePower = 3.0/(1.0/macro[0]+1.0/macro[1]+1.0/size);
 		LOGGER.info("final micro: prec: "+micro[0]+", recall: "+micro[1]+", f1: "+micro[2]);
 		LOGGER.info("final macro: prec: "+macro[0]+", recall: "+macro[1]+", f1: "+macro[2]);
 
@@ -143,6 +144,7 @@ public class GerbilEvaluationModule extends AbstractEvaluationModule {
 		Model model = createDefaultModel();
 		Resource experimentResource = model.getResource(experimentUri);
 		Property noQuestions = model.createProperty(GERBIL.getURI(), "noOfQuestions");
+		Property responsePowerProperty = model.createProperty(GERBIL.getURI(), "responsePower");
 		model.add(experimentResource, RDF.type, HOBBIT.Experiment);
 
 		model.addLiteral(experimentResource, GERBIL.macroPrecision, macro[0]);
@@ -153,7 +155,7 @@ public class GerbilEvaluationModule extends AbstractEvaluationModule {
 		model.addLiteral(experimentResource, GERBIL.microF1, micro[2]);
 		model.addLiteral(experimentResource, GERBIL.errorCount, errorCount);
 		model.addLiteral(experimentResource, noQuestions, size);
-		
+		model.addLiteral(experimentResource, responsePowerProperty, responsePower);
 		return model;
 	}
 
