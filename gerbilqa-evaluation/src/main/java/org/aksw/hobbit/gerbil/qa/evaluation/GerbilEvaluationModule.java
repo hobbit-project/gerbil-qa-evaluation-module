@@ -135,7 +135,11 @@ public class GerbilEvaluationModule extends AbstractEvaluationModule {
 	protected Model summarizeEvaluation() throws Exception {
 		double[] micro = calculateMeasures(globalCounts);
 		double[] macro = getFinalMacro(this.macro, size);
-		double responsePower = 3.0/(1.0/macro[0]+1.0/macro[1]+1.0/size);
+		double responsePower=0;
+		if(macro[0]!=0 || macro[1]!=0 || size!=0) {
+			responsePower = 3.0/(1.0/macro[0]+1.0/macro[1]+1.0/size);
+		}
+			
 		LOGGER.info("final micro: prec: "+micro[0]+", recall: "+micro[1]+", f1: "+micro[2]);
 		LOGGER.info("final macro: prec: "+macro[0]+", recall: "+macro[1]+", f1: "+macro[2]);
 
