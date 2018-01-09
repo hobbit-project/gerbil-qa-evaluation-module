@@ -52,6 +52,7 @@ public class GerbilEvaluationModule extends AbstractEvaluationModule {
 	private EvaluationCounts globalCounts = new EvaluationCounts();
 	private double[] macro = new double[] { 0, 0, 0 };
 	private int size = 0;
+	private int answeredQuestions = 0;
 	private int errorCount = 0;
 	
 	private int question = 0;
@@ -78,7 +79,9 @@ public class GerbilEvaluationModule extends AbstractEvaluationModule {
 	protected void evaluateResponse(byte[] expectedData, byte[] receivedData,
 			long taskSentTimestamp, long responseReceivedTimestamp)
 			throws Exception {
-		
+		if(receivedData!=null && receivedData.length>=0) {
+			answeredQuestions++;
+		}
 		List<AnswerSet> recvAnswers = getMarkings(receivedData, false);
 		List<AnswerSet> goldenStandard = getMarkings(expectedData, true);
 		
@@ -137,7 +140,7 @@ public class GerbilEvaluationModule extends AbstractEvaluationModule {
 		double[] macro = getFinalMacro(this.macro, size);
 		double responsePower=0;
 		if(macro[0]!=0 || macro[1]!=0 || size!=0) {
-			responsePower = 3.0/(1.0/macro[0]+1.0/macro[1]+1.0/size);
+			responsePower = 3.0/(1.0/macro[0]+1.0/macro[1]+1.0/answeredQuestions);
 		}
 			
 		LOGGER.info("final micro: prec: "+micro[0]+", recall: "+micro[1]+", f1: "+micro[2]);
