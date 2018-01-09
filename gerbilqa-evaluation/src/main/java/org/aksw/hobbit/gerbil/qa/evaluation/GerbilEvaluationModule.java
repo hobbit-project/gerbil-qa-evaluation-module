@@ -79,7 +79,7 @@ public class GerbilEvaluationModule extends AbstractEvaluationModule {
 	protected void evaluateResponse(byte[] expectedData, byte[] receivedData,
 			long taskSentTimestamp, long responseReceivedTimestamp)
 			throws Exception {
-		if(receivedData!=null && receivedData.length>=0) {
+		if(receivedData!=null && receivedData.length>0) {
 			answeredQuestions++;
 		}
 		List<AnswerSet> recvAnswers = getMarkings(receivedData, false);
